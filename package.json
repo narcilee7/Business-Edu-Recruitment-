@@ -9,8 +9,7 @@
     "build": "pnpm -r --filter './apps/**' build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "format": "prettier --write .",
-    "clean": "rm -rf node_modules && rm -rf dist && rm -rf pnpm-lock.yaml",
-    "prepare": "husky install"
+    "clean": "rm -rf node_modules && rm -rf dist && rm -rf pnpm-lock.yaml"
   },
   "workspaces": [
     "apps/*",
@@ -23,7 +22,6 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
     "eslint-plugin-react": "^7.37.5",
-    "husky": "^8.0.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3"
   },
