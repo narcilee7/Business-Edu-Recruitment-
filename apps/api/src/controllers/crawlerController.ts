@@ -8,13 +8,6 @@ const crawlerByteDance = async (ctx: Context) => {
     ctx.body = { message: 'url is required' }
     return
   }
-  // try {
-  //   const jobs = await crawlJobPage(url)
-  //   ctx.body = jobs
-  // } catch (error) {
-  //   ctx.status = 500
-  //   ctx.body = { message: '爬取失败' }
-  // }
 }
 
 export {

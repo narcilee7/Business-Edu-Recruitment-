@@ -1,6 +1,6 @@
-import typescriptParser from '@typescript-eslint/parser';
-import typescriptPlugin from '@typescript-eslint/eslint-plugin';
-import reactPlugin from 'eslint-plugin-react';
+import typescriptParser from '@typescript-eslint/parser'
+import typescriptPlugin from '@typescript-eslint/eslint-plugin'
+import reactPlugin from 'eslint-plugin-react'
 
 export default [
   {
@@ -33,8 +33,8 @@ export default [
         '@typescript-eslint/no-non-null-assertion': 'off',
         'no-console': 'warn',
         'no-debugger': 'warn',
-        semi: ['warn', 'never'],
+        semi: ['error', 'never'],
       },
     },
   },
-];
+]
