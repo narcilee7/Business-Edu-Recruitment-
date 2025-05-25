@@ -1,5 +1,5 @@
 {
-  "name": "@edu-requirement/db",
+  "name": "@hire-hub/db",
   "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {

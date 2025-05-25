@@ -1,4 +1,4 @@
-# EDU-Requirement-API
+# hire-hub-API
 
 ## 技术栈
 

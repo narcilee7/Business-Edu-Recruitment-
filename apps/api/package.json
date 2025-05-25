@@ -1,15 +1,23 @@
 {
-  "name": "@edu-requirement/api",
+  "name": "@hire-hub/api",
   "version": "0.1.0",
   "private": true,
-  "description": "edu-requirement api service",
-  "main": "index.js",
+  "description": "hire-hub api service",
+  "type": "module",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "tsc src/server.ts",
     "build": "tsc"
   },
   "dependencies": {
     "@koa/router": "^13.1.0",
-    "koa": "^3.0.0"
+    "@types/koa": "^2.15.0",
+    "@types/koa-router": "^7.4.8",
+    "axios": "^1.9.0",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.5.0",
+    "koa": "^3.0.0",
+    "koa-router": "^13.0.1",
+    "mongodb": "^6.16.0",
+    "nodemon": "^3.1.10"
   }
 }

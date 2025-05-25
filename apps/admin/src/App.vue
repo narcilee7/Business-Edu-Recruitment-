@@ -3,7 +3,9 @@
 </script>
 
 <template>
- <div></div>
+  <div>
+    Business-Hire-Hub
+  </div>
 </template>
 
 <style lang='scss' scoped>
