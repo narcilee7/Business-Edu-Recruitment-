@@ -1,9 +1,11 @@
 import { CHROME_URI } from "../../utils/constants"
 import { chromium } from 'playwright'
 import logger from "../../utils/logger"
-import { ByteDanceData } from "./type";
-import { parseDetail } from "./parser";
-import { saveData } from "./db";
+import { ByteDanceData } from "./type"
+import { parseDetail } from "./parser"
+import { saveData } from "./db"
+import fs from 'fs'
+import { loadProgress, saveProgress } from "./progress"
 
 /**
  * 爬取列表调度
@@ -24,15 +26,15 @@ export async function fetchJobList() {
       headless: false,
       executablePath: CHROME_URI,
     })
+    let pageNum = loadProgress()
     page = await browser.newPage()
     await page.setViewportSize({ width: 1280, height: 800 })
-    await page.goto('https://jobs.bytedance.com/campus/position', {
+    await page.goto(`https://jobs.bytedance.com/campus/position?current=${pageNum}`, {
       waitUntil: 'domcontentloaded',
       timeout: 60000,
     })
     await page.waitForSelector('a[data-id]', { timeout: 30000 })
 
-    let pageNum = 1
     let hasNextPage = true
 
     while (hasNextPage) {
@@ -45,6 +47,7 @@ export async function fetchJobList() {
         const result = await fetchDetail(dataIds as string[])
         if (dataIds.length === result.length) {
           await saveData(result)
+          saveProgress(pageNum)
         }
       } else {
         logger.error('❌ 本页未找到职位ID，结束爬取')
@@ -66,7 +69,6 @@ export async function fetchJobList() {
         pageNum++
       }
     }
-
   } catch (error) {
     logger.error('fetch list error:', error);
   } finally {
