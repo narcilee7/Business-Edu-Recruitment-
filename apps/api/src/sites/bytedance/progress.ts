@@ -26,12 +26,12 @@ export const loadProgress = (): number => {
 
 export const saveProgress = (lastPage: number): void => {
   try {
-    const currentPage = JSON.parse(fs.readFileSync('./progress.json', 'utf-8')).lastPage
+    const currentPage = loadProgress()
     if (currentPage >= lastPage) {
       logger.error("update progress error, currentPage >= lastPage")
       return
     }
-    fs.writeFileSync('./progress.json', JSON.stringify({ lastPage }), 'utf-8')
+    fs.writeFileSync(progressFilePath, JSON.stringify({ lastPage }), 'utf-8')
   } catch (error) {
     logger.error("Failed to save progress.json", error)
     return

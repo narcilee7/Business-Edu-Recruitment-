@@ -4,7 +4,6 @@ import logger from "../../utils/logger"
 import { ByteDanceData } from "./type"
 import { parseDetail } from "./parser"
 import { saveData } from "./db"
-import fs from 'fs'
 import { loadProgress, saveProgress } from "./progress"
 
 /**
