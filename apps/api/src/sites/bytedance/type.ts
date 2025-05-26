@@ -8,7 +8,6 @@ type ByteDanceData = {
   createAt: string;
 }
 
-
 export {
   ByteDanceData
 }
