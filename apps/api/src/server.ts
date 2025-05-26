@@ -1,9 +1,9 @@
 import app from './app'
 import { PORT } from './config'
 import { dispatchAllJobs } from './scheduler/dispatcher'
-import { connectDB } from './utils/db'
+import { initAndConnDB } from './utils/db'
 
-await connectDB()
+await initAndConnDB()
 
 await dispatchAllJobs()
 
