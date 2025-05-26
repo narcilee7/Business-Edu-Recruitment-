@@ -3,9 +3,7 @@
 </script>
 
 <template>
-  <div>
-    Business-Hire-Hub
-  </div>
+  <router-view />
 </template>
 
 <style lang='scss' scoped>
