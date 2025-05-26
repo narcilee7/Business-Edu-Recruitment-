@@ -1,10 +1,11 @@
 import { CHROME_URI } from "../../utils/constants"
-import { chromium } from 'playwright'
+import { Browser, chromium } from 'playwright'
 import logger from "../../utils/logger"
 import { ByteDanceData } from "./type"
 import { parseDetail } from "./parser"
 import { saveData } from "./db"
 import { loadProgress, saveProgress } from "./progress"
+import pLimit from "p-limit"
 
 /**
  * 爬取列表调度
@@ -18,7 +19,7 @@ import { loadProgress, saveProgress } from "./progress"
  */
 
 export async function fetchJobList() {
-  let browser = null;
+  let browser: Browser | null = null;
   let page = null;
   try {
     browser = await chromium.launch({
@@ -43,7 +44,9 @@ export async function fetchJobList() {
         return links.map(link => link.getAttribute('data-id'));
       })
       if (dataIds && dataIds.length > 0) {
-        const result = await fetchDetail(dataIds as string[])
+        console.log('dataIds', dataIds);
+        const result = await fetchDetail(dataIds as string[], browser)
+        console.log('result', result);
         if (dataIds.length === result.length) {
           await saveData(result)
           saveProgress(pageNum)
@@ -52,12 +55,10 @@ export async function fetchJobList() {
         logger.error('❌ 本页未找到职位ID，结束爬取')
         break
       }
-
       const isDisabled = await page.evaluate(() => {
         const nextBtn = document.querySelector('.atsx-pagination-next');
         return nextBtn?.classList.contains('atsx-pagination-disabled');
       })
-
       if (isDisabled) {
         logger.info('✅ 本页已无更多职位，结束爬取')
         break
@@ -77,42 +78,34 @@ export async function fetchJobList() {
   }
 }
 
-const fetchDetail = async (linkIds: string[]): Promise<ByteDanceData[]> => {
+const fetchDetail = async (linkIds: string[], browser: Browser): Promise<ByteDanceData[]> => {
   if (linkIds.length === 0) {
     logger.info('❌ No linkIds provided.')
     return []
   }
-  let browser = null
-  let page = null
-  try {
-    browser = await chromium.launch({
-      headless: false,
-      executablePath: CHROME_URI,
+  const limit = pLimit(5)
+  const promises = linkIds.map((linkId) =>
+    limit(async () => {
+      const page = await browser.newPage()
+      try {
+        const detailUrl = `https://jobs.bytedance.com/campus/position/${linkId}/detail`
+        await page.goto(detailUrl, {
+          waitUntil: 'domcontentloaded',
+          timeout: 60000,
+        })
+        await page.waitForSelector('div.block-content', { timeout: 30000 })
+        const html = await page.content()
+        const detail = parseDetail(html, linkId)
+        logger.info(`✅ Fetched detail for ${linkId}`)
+        return detail
+      } catch (error) {
+        logger.error(`❌ Failed to fetch detail for ${linkId}:`, error)
+        return null
+      } finally {
+        await page.close()
+      }
     })
-    page = await browser.newPage()
-    await page.setViewportSize({ width: 1280, height: 800 });
-    let result: ByteDanceData[] = []
-    for (const linkId of linkIds) {
-      const detailUrl = `https://jobs.bytedance.com/campus/position/${linkId}/detail`
-      await page.goto(detailUrl, {
-        waitUntil: 'networkidle',
-        timeout: 60000,
-      })
-      await page.waitForSelector('div.block-content', { timeout: 30000 })
-      const html = await page.content()
-      const detail = parseDetail(html, linkId)
-      result.push(detail)
-    }
-    return result
-  } catch (error) {
-    logger.error("❌ Detail Error:", error)
-    return []
-  } finally {
-    if (browser) {
-      await browser.close()
-    }
-    if (page) {
-      await page.close()
-    }
-  }
+  )
+  const result = await Promise.all(promises)
+  return result.filter(Boolean) as unknown as ByteDanceData[]
 }
